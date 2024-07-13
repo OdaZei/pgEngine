@@ -1,0 +1,8 @@
+c++ -Wall -Werror -g -Iinclude/ -c Transform.cpp -MMD -o build/objects/Transform.o
+
+
+
+
+
+
+

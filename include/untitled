@@ -1,0 +1,55 @@
+Window Manager and Event Manager for SFML base handling.
+
+Node: pointer of children node's
+and a parent node pointer.
+
+     A
+    B  E
+   C D  F
+ 
+A children : B, E; parent: None;
+B : children C, D; parent: A;
+
+Node class overrides: draw function -> sf::Drawable;
+drawCurrent implemented on child class;
+
+object
+
+
+handling player movement after collision;
+
+currently saving data to a vector holding the inverse movement direction;
+
+-----------------
+Left  ->  1 0
+Right -> -1 0
+Up    ->  0 1
+Down  ->  0-1 
+-----------------
+pressing 2 keys at the same time -> causes interconection;
+
+modifying the last move per axis;
+
+
+ObjectInfo struct:
+if an obj has a collider.
+--- to be thought ---
+if its pickable.
+if it can be moved impulsed;
+
+
+
+//
+
+main
+
+@Added States;
+@Added Basic Menu Page
+
+@Todo **add map data**
+
+@Added pseudorandom generator -> **Simplex generation**.
+@Added Update map over player position.
+**Modify to bound on map boundaries**
+
+@Todo : add collision detection to map
