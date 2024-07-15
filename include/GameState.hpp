@@ -14,6 +14,9 @@ class GameState: public EngineState {
         void render(sf::RenderTarget*) override;
         void reset( );
         sf::View getCamera(int) override;
+    protected:
+        bool menuIsOpen;
+        int  menuIndex;
     private:
         GameState* gState_;
         

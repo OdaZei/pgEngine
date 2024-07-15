@@ -53,3 +53,9 @@ main
 **Modify to bound on map boundaries**
 
 @Todo : add collision detection to map
+
+
+@Todo:
+* Add Ui Manager :
+**stack ui node* element : currently text**
+**default ui view as camera class**
