@@ -4,9 +4,9 @@
 
 #include "include/Grid.hpp"
 
-static const int SCREEN_HEIGHT = 480;
-static const int SCREEN_WIDTH = 680;
-static const int BITSPERPIXEL = 4;
+static const int SCREEN_HEIGHT = 9*32;
+static const int SCREEN_WIDTH = 16*32;
+static const int BITSPERPIXEL = 1;
 static const char* SCREEN_TITLE = "0XD3F0";
 
 WindowManager::WindowManager():  windowWidth(SCREEN_WIDTH)\

@@ -18,9 +18,8 @@ void StartServicesState::handleEvents( ) {
 }
 void StartServicesState::update( float dt ) {
     if( cState_ ){
-        WinMan->setView(cState_->getCamera(1));
+        WinMan->setView(cState_->getCamera(0));
         cState_->update( dt );
-        WinMan->setView(cState_->getCamera(0 ) );
     }
 }
 void StartServicesState::render() {

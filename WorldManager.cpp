@@ -2,7 +2,6 @@
 
 #include "include/WorldManager.hpp"
 
-
 //!@DEBUG!
 typedef enum tType { water, sand, land};
 World::World( ): origin(sf::Vector2f(0,0)), displaymap( sf::Image( )), tex( sf::Texture() )\
@@ -24,7 +23,7 @@ World::World( ): origin(sf::Vector2f(0,0)), displaymap( sf::Image( )), tex( sf::
 }
 World::World(float xOrigin, float yOrigin, float freq, float ampl, float lac, float pers ): \
 origin(sf::Vector2f(xOrigin,yOrigin)), displaymap( sf::Image( ))\
-, tex( sf::Texture() ), spr(sf::Sprite()), tiledSpr(sf::Sprite()), generator( nullptr )\
+, tex( sf::Texture() ), spr(sf::Sprite()), generator( nullptr )\
 , sprSheet( nullptr ) {
     /*
     * SimplexNoise:
@@ -37,8 +36,7 @@ origin(sf::Vector2f(xOrigin,yOrigin)), displaymap( sf::Image( ))\
     */
 
     generator = new SimplexNoise(freq, ampl, lac, pers);
-    sprSheet  = new SpriteSheet(8,8);
-
+    sprSheet = new SpriteSheet();
     displaymap.create(W, H, sf::Color::White);
 
     if(buildImage(8, 0, 0))    printf( "<!>: World MiniMap created!\n" );
@@ -49,7 +47,8 @@ how da fuck are we goig to make this happen!
 */
 World::~World( ) {}
 bool World::buildImage(size_t octave, unsigned int shiftX, unsigned int shiftY) {
-    for( unsigned int i = 0; i <  W; i++ ){ 
+    pixelToId = std::vector<std::vector<int>>(W, std::vector<int>(H,0));
+    for( unsigned int i = 0; i <  W; i++ ){
         for( unsigned int j = 0; j <  H; j++ ){
             int tile = 0; 
             float h = generator->fractal(octave,i + shiftX,j + shiftY);
@@ -79,25 +78,18 @@ bool World::buildImage(size_t octave, unsigned int shiftX, unsigned int shiftY) 
 }
 /*
  *  <@Params:
- *  < mode      -> 0 pixel map, 1 tilemap.
  *  < x , y     -> update world view from available pixelMap.    
  *  < oCx, oCy  -> origin position to draw map , top left;
- *  //<@ MODE 0 ->miniMap;
-    //<@ MODE 1 ->spriteMap;
+
 */
-sf::Sprite World::getMapImage(int mode, int x, int y, float oCx, float oCy ) {
+bool World::getMapImage( int x, int y, float oCx, float oCy ) {
     origin = sf::Vector2f( oCy, oCy );
-    printf( "|| %d, %d \n", x, y );
     buildImage(8, x, y );
-    if( mode == 0)  spr.setPosition( origin );
-    else    tiledSpr.setPosition( origin );
-    
-    if(!updateWorldView( x, y )) return spr;
-    return  ( mode == 0) ? spr : tiledSpr ;
+    updateWorldView(x,y);
 }
 bool World::updateWorldView( int x, int y) {
     
-    int arr[CW][CH];
+    std::vector<std::vector<int>> arr(CW, std::vector<int>(CH));
     if( x < 0 ) x = 0;
     if( y < 0 ) y = 0;
     if( x + CW >= W ) x = W - CW;
@@ -108,37 +100,18 @@ bool World::updateWorldView( int x, int y) {
             arr[k][j] = g;
         }
     }
-    pixelsToSpriteImage( arr );
+    if(!pixelsToSpriteImage( arr )) return false;
     return true;
 }
-bool World::pixelsToSpriteImage( int pixels[CW][CH] ) {
-    sf::Texture* spriteMap = new sf::Texture( );
-    spriteMap->create( CW*8, CH*8);
-    for( unsigned int k = 0; k < CW; k++ ){
-        for( unsigned int j = 0; j < CH; j++ ){
-            int i = pixels[k][j];
-            sf::Texture* t;
-            switch(i){
-                case 0 :
-                    t = sprSheet->getTile( 0, 0, 8, 8);
-                    break;
-                case 1:
-                    t = sprSheet->getTile( 8, 0, 8, 8);
-                    break;
-                case 2:
-                    t = sprSheet->getTile( 16, 0, 8, 8);
-                    break;
-                case 3:
-                    t = sprSheet->getTile( 0, 8, 8, 8);
-                    break;
-                case 4:
-                    t = sprSheet->getTile( 8, 8, 8, 8);
-                    break;
-            }
-            spriteMap->update(*t ,k *8 , j*8 );
+bool World::pixelsToSpriteImage( std::vector<std::vector<int>> pixels ) {
+    sprSheet  = new SpriteSheet(pixels,CW,CH);
+    if(!sprSheet) return false;
+    return true;
+}
 
-        }
-    }
-    tiledSpr.setTexture( *spriteMap );
-    return true;
+void World::drawmap( sf::RenderTarget* target, sf::RenderStates states) {
+    //states.transform *= getTransform();
+    states.texture = sprSheet->getTexture();
+    target->draw(sprSheet->getTiles(), states);
 }
+

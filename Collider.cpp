@@ -97,13 +97,7 @@ bool Collider::CheckCollision(Collider& other) {
     v Q = v(pOther.x , pOther.y - halfDim.y);
     v R = v(pOther.x , pOther.y + halfDim.y);
     dimDiff = v(dim.x + dimDiff.x, dim.y + dimDiff.y);
-    
-    //printf("%f, %f\n", pOther.x, pOther.y);
 
-    //printf( "Line section: Q:x[ %f ], y:[ %f ], Ry:x[ %f ], y:[ %f ]\n[", Q.x , Q.y, R.x, R.y );
-    //printf( "Line section: O:x[ %f ], y:[ %f ], Py:x[ %f ], y:[ %f ]\n[", O.x , O.y, P.x, P.y );
-
-    //X=
     float e , r = 0;
     bool t1 , t2 = false;
     if( (IntersectionBetweenLines( C , D , O, P , e ,r ))){

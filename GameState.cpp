@@ -1,10 +1,9 @@
 #include "include/GameState.hpp"
-/*@DeBug*/
-#include "include/TextHolder.hpp"
+#include "include/UiManager.hpp"
 
-TextHolder * textHl;
+UiManager * uiman;
 
-GameState::GameState(): EngineState(2), gState_( nullptr ), entManager( nullptr )\
+GameState::GameState(): menuIsOpen(false), menuIndex(-1), EngineState(2), gState_( nullptr ), entManager( nullptr )\
 , world( nullptr ), camera(nullptr), miniMap(nullptr) {
     entManager = new Entities();
 
@@ -19,15 +18,11 @@ GameState::GameState(): EngineState(2), gState_( nullptr ), entManager( nullptr 
     entManager->addEntity( Entities::entitiesType::player, v , .0f);
 
     /*Map and camera position on initialize*/
-    camera = new Camera(0,0,170,120);
+    camera = new Camera(0,0,340,240);
     sf::Vector2f view = camera->getViewSize();
 
-    world = new World(0,0,0.02f, 0.5,2.0, 0.5);
-
-    /*MiniMap*/
-    miniMap = new Camera(0,0,170,120);
-
-    textHl = new TextHolder( "OxDeF0", 0, 0 );
+    world = new World(-120,-120,0.02f, 0.5,2.0, 0.5);
+    uiman = new UiManager(0,0, 480, 480);
 }
 EngineState* GameState::handleEvents( const sf::Event& e) {
     entManager->handleEvents( e );
@@ -36,33 +31,43 @@ EngineState* GameState::handleEvents( const sf::Event& e) {
             gState_->reset(); //Restart
             return gState_;
         }
+        if(e.key.code == sf::Keyboard::E && !menuIsOpen){
+            menuIndex = uiman->addMenu( 340 , 240 );
+            menuIsOpen = true;
+        }else if (e.key.code == sf::Keyboard::E && menuIsOpen){
+            if(menuIndex != -1){
+                uiman->popElement(menuIndex);
+                menuIndex = -1;
+                menuIsOpen = false;
+            }
+        }
+
     }
     return nullptr;
 }
 
 void GameState::update( float dt ) {
-    //upd
-    printf( "<<Game State update>: delta: %f \n", dt );
-    entManager->updateEntities( dt );
-    char arr[256];
-    sprintf( arr, "%f", 1000 / dt ); 
 
-    textHl->setText( arr );
+    entManager->updateEntities( dt );
+    uiman->update(0,dt);
+    char arr[32] {"Explore the sourroundings"};
+    if(menuIsOpen) uiman->update(1, arr);
+    world->getMapImage( entManager->getPlayerCtrlPos().x, entManager->getPlayerCtrlPos().y, -120,-120 );
     camera->moveCamera( entManager->getPlayerCtrlPos().x, entManager->getPlayerCtrlPos().y, dt);
     //miniMap->moveCamera( entManager->getPlayerCtrlPos().x, entManager->getPlayerCtrlPos().y, dt);
 }
 void GameState::render( sf::RenderTarget* target) {
     sf::Vector2f  v = entManager->getPlayerCtrlPos();
     sf::Vector2f  dView = camera->getViewSize();
-    target->draw( world->getMapImage(1, v.x, v.y, 0,0));
+    target->setView( camera->getCamera() );
+    world->drawmap(target, sf::RenderStates::Default);
     entManager->drawEntities(target, sf::RenderStates::Default);
-    textHl->drawCurrent( *target, sf::RenderStates::Default );
+    target->setView( uiman->getCamera() );
+    uiman->render( *target, sf::RenderStates::Default );
 }
 void GameState::reset( ) {
     //
 }
 sf::View GameState::getCamera(int type) {
-    if(type == 0)
-        return camera->getCamera();
-    return miniMap->getCamera();
+    return camera->getCamera();
 }

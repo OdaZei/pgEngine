@@ -10,7 +10,6 @@ std::shared_ptr<Object*> Entities::addPlayerController( sf::Vector2f pos ) {
     std::shared_ptr<Object*> ptr = nullptr; 
     
     sf::Vector2f d = sf::Vector2f(Entities::CellSize , Entities::CellSize);
-    printf( "Dimmm: %f, %f",d.x, d.y );
     PlayerController* tempObj =  new PlayerController(pos, d);
 
     sf::Color c =  sf::Color( sf::Color::White );
@@ -21,11 +20,14 @@ std::shared_ptr<Object*> Entities::addPlayerController( sf::Vector2f pos ) {
     playerControl = tempObj;
     playerControl->set_position(pos.x, pos.y);
     playerControl->set_dimensions(d);
-    printf( "%f, %f", playerControl->get_dimension().x, playerControl->get_dimension().y );
+
     ptr = std::make_shared<Object*>( tempObj );
+    
     playerCtrlPos = playerControl->get_position();
+    
     if( ptr )
         playerExists = true;
+
     return ptr;
 }
 void Entities::addEntity( entitiesType eT, sf::Vector2f pos, float angle ) {
@@ -36,7 +38,7 @@ void Entities::addEntity( entitiesType eT, sf::Vector2f pos, float angle ) {
     }else if ( eT == Entities::entitiesType::empty_block ){
         Object* block = new Object( eT, p , sf::Vector2f( Entities::CellSize, Entities::CellSize ));
 
-        sf::Color c =  sf::Color( sf::Color::Cyan );
+        sf::Color c =  sf::Color( sf::Color::Red );
         block->set_FillColor( c );
     
         block->set_move( p.x , p.y );
@@ -50,6 +52,7 @@ void Entities::addEntity( entitiesType eT, sf::Vector2f pos, float angle ) {
 void Entities::updateEntities( float dt ) {
     for( auto& en: entities ){
         Object* ent = *en.first;
+        
         if(ent->oData->hasCollider) {
             if( ent->oData->type != playerControl->oData->type && playerControl->collider->CheckCollision( *ent->collider )){    
                 playerControl->set_move( playerControl->lookingDir.x*100*dt, playerControl->lookingDir.y*100*dt );
