@@ -1,45 +1,24 @@
 #include "include/GameState.hpp"
-#include "include/UiManager.hpp"
+#include "include/Menu.hpp"
 
-UiManager * uiman;
+char arr[32] {"Menu or so"};
 
-GameState::GameState(): menuIsOpen(false), menuIndex(-1), EngineState(2), gState_( nullptr ), entManager( nullptr )\
-, world( nullptr ), camera(nullptr), miniMap(nullptr) {
-    entManager = new Entities();
-
-    float OriginX = 0.f, OriginY = 0.f;
-	sf::Vector2f v = sf::Vector2f( OriginX , OriginY );
-
-	entManager->addEntity( Entities::entitiesType::empty_block, v , .0f);
-
-    /*offset player position to check custom  transform position*/
-    v = sf::Vector2f( OriginX  , OriginY + 8 );
-
-    entManager->addEntity( Entities::entitiesType::player, v , .0f);
-
-    /*Map and camera position on initialize*/
-    camera = new Camera(0,0,340,240);
-    sf::Vector2f view = camera->getViewSize();
-
-    world = new World(-120,-120,0.02f, 0.5,2.0, 0.5);
+GameState::GameState(): EngineState(2), gState_( nullptr ), weM(nullptr) ,camera(nullptr), uiman(nullptr), menuIsOpen(false), menuIndex(-1) {
+    weM = new WEM();
+    camera = new Camera(0,0,340,240, true, -120,-120, 256, 256);
+    //sf::Vector2f view = camera->getViewSize();
     uiman = new UiManager(0,0, 480, 480);
+    menuIndex = uiman->addMenu( 340 , 240 , arr);
+    uiman->updateC(1 , arr );
+    menuIsOpen = true;
 }
+std::shared_ptr<UiElement*> menu;
 EngineState* GameState::handleEvents( const sf::Event& e) {
-    entManager->handleEvents( e );
+    weM->handleEvents( e );
     if (e.type == sf::Event::KeyPressed) {
         if (e.key.code == sf::Keyboard::Escape) {
             gState_->reset(); //Restart
             return gState_;
-        }
-        if(e.key.code == sf::Keyboard::E && !menuIsOpen){
-            menuIndex = uiman->addMenu( 340 , 240 );
-            menuIsOpen = true;
-        }else if (e.key.code == sf::Keyboard::E && menuIsOpen){
-            if(menuIndex != -1){
-                uiman->popElement(menuIndex);
-                menuIndex = -1;
-                menuIsOpen = false;
-            }
         }
 
     }
@@ -48,20 +27,29 @@ EngineState* GameState::handleEvents( const sf::Event& e) {
 
 void GameState::update( float dt ) {
 
-    entManager->updateEntities( dt );
-    uiman->update(0,dt);
-    char arr[32] {"Explore the sourroundings"};
-    if(menuIsOpen) uiman->update(1, arr);
-    world->getMapImage( entManager->getPlayerCtrlPos().x, entManager->getPlayerCtrlPos().y, -120,-120 );
-    camera->moveCamera( entManager->getPlayerCtrlPos().x, entManager->getPlayerCtrlPos().y, dt);
-    //miniMap->moveCamera( entManager->getPlayerCtrlPos().x, entManager->getPlayerCtrlPos().y, dt);
+    weM->update( dt );
+    uiman->updateF(0,dt); // update fps text;};
+    //Update corrdinate text
+    char arr2[32];
+    sprintf(arr2, "X:%0.1f,Y:%0.1f,Z:%0.1f",weM->getOrigin().x, weM->getOrigin().y, 1.f );
+    uiman->updateTC(1, arr2);
+    //uiman->updateC(1,arr);
+    
+    char arr1[32] {"Maybe!"};
+    uiman->updateC( 0,arr1);
+    sprintf(arr1, "Accel: %0.5f", weM->getPlayerAccel());
+    uiman->updateC( 1,arr1);
+    
+    camera->moveCamera( weM->getOrigin().x  , weM->getOrigin().y  , dt);
+    
 }
 void GameState::render( sf::RenderTarget* target) {
-    sf::Vector2f  v = entManager->getPlayerCtrlPos();
-    sf::Vector2f  dView = camera->getViewSize();
+    // sf::Vector2f  dView = camera->getViewSize();
+
     target->setView( camera->getCamera() );
-    world->drawmap(target, sf::RenderStates::Default);
-    entManager->drawEntities(target, sf::RenderStates::Default);
+    weM->render( target );
+
+    //Render ui
     target->setView( uiman->getCamera() );
     uiman->render( *target, sf::RenderStates::Default );
 }

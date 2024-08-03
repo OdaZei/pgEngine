@@ -5,30 +5,59 @@ Object::Object(): oData(nullptr), shape(nullptr) {
 	Node();
 	shape = new sf::RectangleShape( );
 	oData = new ObjectData(-1, false, false );
-	collider = new Collider();
+
+	collider 	= new Collider();
+	HasTexture 	= false;
+	
+	spritesheetTexture  = nullptr;
+	hasAnimation 		= false;
+	nTextures			= 0;
+	currentTexture		= 0;
+
 }
-Object::Object( int type, sf::Vector2f pos, sf::Vector2f dim ): oData(nullptr)\
-, shape(nullptr), collider(nullptr) {
+/*
+	(  0 ) hasTexture -> true && textureIndex > -1;
+	( *0 ) need reference to vertexBuffer index;
+	** _vArr -> is passed as default
+*/
+Object::Object( int type, sf::Vector2f pos, sf::Vector2f dim , bool _hasTexture, sf::VertexArray _vArr, int _textureIndex, sf::Texture* s, ): shape(nullptr), collider(nullptr),oData(nullptr) {
 	Transform( pos, dim );
 	Transform::setPosition( pos );
 	Node(); // Creates Drawable node;
-	shape = new sf::RectangleShape( );
-	shape->setPosition( pos );
-	shape->setSize( dim );
-	shape->setOrigin( pos.x + dim.x / 2 , pos.y + dim.y / 2);
+	// Case static texture;
+	if( _hasTexture && _textureIndex > -1 ) {
+		vertexArr  = _vArr;
+		hasTexture =  _hasTexture;
+		textureVertexIndex = _textureIndex;
+		spritesheetTexture = s;
+		if()
+	}else {
+		//Case no Texture;
+		hasTexture = false;
+		shape = new sf::RectangleShape( );
+		shape->setPosition( pos );
+		shape->setSize( dim );
+		shape->setOrigin( pos.x + dim.x / 2 , pos.y + dim.y / 2);
+	}
 	//set has collider and canMove
 	if(type != 0 ){
-		oData = new ObjectData(type, true, false );
+		oData = new ObjectData(type, false, false );
 	}else{
 		oData = new ObjectData(type, true, true );
 	}
 	collider = new Collider( pos, dim );
-
 }
 Object::~Object(){}
 void Object::set_move( float x, float y ){
 	Move( x, y );
 	collider->Move(x,y);
+	if( hasTexture ){
+		for( int i = 0 ; i < vertexArr.getVertexCount(); i++ ) {
+			sf::Vertex* v = &vertexArr[i];
+			v->position.x += x;
+			v->position.y += y;
+		}
+	}
 }
 void Object::set_position( float x, float y ) {
 	Transform::setPosition( x, y );
@@ -50,9 +79,13 @@ sf::RectangleShape Object::getShape( ) {
 	return *shape;
 }
 void Object::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const{
-	states.transform *= getTransform();
+	printf( "Running Object Draw\n" );
 	target.draw( collider->colliderAxis , states );
-	target.draw( *shape , states );
+	if( hasTexture ){
+		states.texture = spritesheetTexture;
+		target.draw( vertexArr, states);
+	}else
+		target.draw( *shape , states );
 }
 void Object::update( float dt )  {
 	
@@ -67,4 +100,7 @@ void Object::setObjectType( int t ) {
 
 int Object::getObjectType( ) {
 	return oData->type;
+}
+Collider* Object::getCollider() {
+	return collider;
 }

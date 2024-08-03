@@ -4,7 +4,7 @@
 Transform::Transform( ): Transformable(), position( sf::Vector2f(0,0) ), dimensions( sf::Vector2f(1,1) ) {}
 
 Transform::Transform( sf::Vector2f pos, sf::Vector2f dim ): Transformable(), position( pos ), dimensions( dim ) {
-	printf("Setting transform position at: %f, %f, %f, %f\n", pos.x, pos.y, dim.x, dim.y);
+	//printf("Setting transform position at: %f, %f, %f, %f\n", pos.x, pos.y, dim.x, dim.y);
 	setPosition(pos);
 }
 
@@ -26,4 +26,7 @@ void Transform::set_position( v pos ){
 }
 void Transform::set_dimensions(v dim ){
 	dimensions = dim;
+}
+sf::Transform Transform::getTransf( ) const {
+	return getTransform();
 }
