@@ -7,20 +7,20 @@ Object::Object(): oData(nullptr), shape(nullptr) {
 	oData = new ObjectData(-1, false, false );
 
 	collider 	= new Collider();
-	HasTexture 	= false;
+	hasTexture 	= false;
 	
 	spritesheetTexture  = nullptr;
 	hasAnimation 		= false;
 	nTextures			= 0;
 	currentTexture		= 0;
-
+	vertexArr 			= std::vector<sf::VertexArray>();
 }
 /*
 	(  0 ) hasTexture -> true && textureIndex > -1;
 	( *0 ) need reference to vertexBuffer index;
 	** _vArr -> is passed as default
 */
-Object::Object( int type, sf::Vector2f pos, sf::Vector2f dim , bool _hasTexture, sf::VertexArray _vArr, int _textureIndex, sf::Texture* s, ): shape(nullptr), collider(nullptr),oData(nullptr) {
+Object::Object( int type, sf::Vector2f pos, sf::Vector2f dim , bool _hasTexture, std::vector<sf::VertexArray> _vArr, int _textureIndex, sf::Texture* s, bool hasTxs, unsigned int nTxs): shape(nullptr), collider(nullptr),oData(nullptr) {
 	Transform( pos, dim );
 	Transform::setPosition( pos );
 	Node(); // Creates Drawable node;
@@ -30,7 +30,19 @@ Object::Object( int type, sf::Vector2f pos, sf::Vector2f dim , bool _hasTexture,
 		hasTexture =  _hasTexture;
 		textureVertexIndex = _textureIndex;
 		spritesheetTexture = s;
-		if()
+		if( hasTxs ){
+			hasAnimation  = hasTxs;
+			if( nTxs > 0 ){
+				nTextures = nTxs;
+				//Start animation from index 0;
+				currentTexture = 0; 
+			}else{
+				//Set static textures if nTxs( number of textures ) == 0;
+				hasAnimation = false;
+				nTextures = 0;
+				currentTexture = 0;
+			}
+		}
 	}else {
 		//Case no Texture;
 		hasTexture = false;
@@ -51,13 +63,20 @@ Object::~Object(){}
 void Object::set_move( float x, float y ){
 	Move( x, y );
 	collider->Move(x,y);
-	if( hasTexture ){
-		for( int i = 0 ; i < vertexArr.getVertexCount(); i++ ) {
-			sf::Vertex* v = &vertexArr[i];
-			v->position.x += x;
-			v->position.y += y;
-		}
+	
+	unsigned int cnt = 0;
+	if( hasTexture && hasAnimation ){
+		cnt = currentTexture;
+	}else if( hasTexture ){
+		cnt = 0;
 	}
+	/*
+	for( int i = 0 ; i < vertexArr[cnt].getVertexCount(); i++ ) {
+		sf::Vertex* v = &vertexArr[cnt][i];
+		v->position.x += x;
+		v->position.y += y;
+	}
+	*/
 }
 void Object::set_position( float x, float y ) {
 	Transform::setPosition( x, y );
@@ -78,18 +97,25 @@ void Object::set_FillColor( sf::Color c ) {
 sf::RectangleShape Object::getShape( ) {
 	return *shape;
 }
+unsigned int ct = 0;
 void Object::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const{
-	printf( "Running Object Draw\n" );
+	//states.transform *= getTransform();
+	printf( "Post PlayerObject created\n");
+	printf( "Running Object Draw, SIZE OF VERTEX ARR: %ld\n", vertexArr.size());
 	target.draw( collider->colliderAxis , states );
+	/*
 	if( hasTexture ){
 		states.texture = spritesheetTexture;
-		target.draw( vertexArr, states);
+		if( hasAnimation ){
+			target.draw( vertexArr[0] , states );
+		}else{
+			target.draw( vertexArr[0], states);	
+		}
 	}else
-		target.draw( *shape , states );
+	*/
+	target.draw( *shape , states );
 }
-void Object::update( float dt )  {
-	
-}
+void Object::update( float dt )  {}
 void Object::handleEvents( sf::Event e) {
 }
 /*

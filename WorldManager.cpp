@@ -129,13 +129,16 @@ std::vector<int> World::getTile( int x, int y, Collider other ){
 }
 bool World::pixelsToSpriteImage( std::vector<std::vector<int>> pixels ) {
     sprSheet->update( pixels, CW, CH);
-    if(!sprSheet) return false;
+    if(!sprSheet){
+        printf( "\n\n\nNo spriteSheet\n\n\n"  );
+        return false;
+    }
     return true;
 }
 int c = 0;
 void World::drawmap( sf::RenderTarget* target, sf::RenderStates states) {
     if(c == 0)  displaymap.saveToFile( "MapGeneration.bmp" );
-    states.transform = transform.getTransform();
+    //states.transform = transform.getTransform();
     states.texture = sprSheet->getTexture();
     target->draw(sprSheet->getTiles(), states);
     //target->draw(spr); 

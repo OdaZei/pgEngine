@@ -8,11 +8,11 @@
     R ->  1 , 0
     D ->  0 ,-1
 */
-PlayerController::PlayerController( ): Object( 0, sf::Vector2f( 20 , 20) , sf::Vector2f( 8, 8), false, sf::VertexArray(), -1 , nullptr), lookingDir(sf::Vector2f(0, -1)), velocity(sf::Vector2f()) {
+PlayerController::PlayerController( ): Object( 0, sf::Vector2f( 20 , 20) , sf::Vector2f( 8, 8), false, std::vector<sf::VertexArray>(), -1 , nullptr), lookingDir(sf::Vector2f(0, -1)), velocity(sf::Vector2f()) {
     set_FillColor( pColor );
     vA = sf::VertexArray(sf::Lines, 8 );
 }
-PlayerController::PlayerController(sf::Vector2f pos , sf::Vector2f dim, sf::VertexArray vtx, sf::Texture* s, unsigned int ind ): Object(0, pos , dim , true, vtx, (int)ind, s), lookingDir(sf::Vector2f(0, -1)), velocity(sf::Vector2f()) {
+PlayerController::PlayerController(sf::Vector2f pos , sf::Vector2f dim, std::vector<sf::VertexArray> vtx, sf::Texture* s, unsigned int ind , bool hAnim , unsigned int animSz ): Object(0, pos , dim , true, vtx, (int)ind, s, hAnim , animSz), lookingDir(sf::Vector2f(0, -1)), velocity(sf::Vector2f()) {
     Transform(pos, dim);
     
     vA = sf::VertexArray(sf::Lines, 8 );

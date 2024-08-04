@@ -15,35 +15,32 @@ WEM::WEM( ) {
     woMan = std::make_unique<World>( wm );
     
     e.addEntity( Entities::entitiesType::player, v , .0f);
-
+    printf( "Beeep\n" );
     enMan = std::make_unique<Entities>( e );
+    printf( "Beeep2\n" );
 }
 WEM::~WEM( ) {
 
 }
 void WEM::setTiles( int _x, int _y ) {
     // Get Player closest tiles 8 coordinate; ( Debug )
-    std::vector<int> t = woMan->getTile(_x / 8 ,_y / 8, *enMan->getPlayerCtrlCollider());
-    enMan->updatePlayerTiles( t );
+    //std::vector<int> t = woMan->getTile(_x / 8 ,_y / 8, *enMan->getPlayerCtrlCollider());
+    //enMan->updatePlayerTiles( t );
 }
 void WEM::update( float dt ) {
-    sf::Vector2f pp = enMan->getPlayerCtrlPos( );
-    
-    //Checks collision against 8 close tiles;
-    if(woMan->getMapImage( pp.x, pp.y,120, 120)) setTiles( pp.x, pp.y );
-    
-    enMan->updateEntities( dt );
+    woMan->getMapImage( 0 , 0 ,0, 0);
+    //enMan->updateEntities( dt );
 }
 void WEM::render( sf::RenderTarget* target ) {
     woMan->drawmap( target, states);
-    enMan->drawEntities( target,states);   
+    //enMan->drawEntities( target,states);   
 }
 void WEM::handleEvents( const sf::Event& e ) {
-    enMan->handleEvents( e );
+    //enMan->handleEvents( e );
 }
 sf::Vector2f WEM::getOrigin( ) {
-    return enMan->getPlayerCtrlPos();
+    //return enMan->getPlayerCtrlPos();
 }
 float WEM::getPlayerAccel( ){
-    return enMan->getPlayerData( 0 );
+    //return enMan->getPlayerData( 0 );
 }

@@ -6,7 +6,7 @@
 // Empty constrytuctor
 Entities::Entities(SpriteSheet * sprites ): \
 entities( std::unordered_map<std::shared_ptr<Object*>,  sf::Vector2f*>( ) )\
-, playerCtrlPos(sf::Vector2f()), playerControl(nullptr), playerExists(false), entitiesIndex(){
+, playerCtrlPos(sf::Vector2f(0,0)), playerControl(nullptr), playerExists(false), entitiesIndex(){
     sprSheet = sprites; 
     entitiesIndex = std::vector<int>();
 }
@@ -15,20 +15,23 @@ std::shared_ptr<Object*> Entities::addPlayerController( sf::Vector2f pos ) {
     
     std::shared_ptr<Object*> ptr = nullptr;
     unsigned int index = 0;
+    unsigned int pAnimSz = 1;
     // #64 -> player texture;
-    sf::VertexArray vtx = sprSheet->setTextureSlice(pos.y, pos.y, index, 64);
-
+    /*Debug*/
+    std::vector<sf::VertexArray> animation; //= sprSheet->setAnimationSlice(pos.x, pos.y, index, 64, pAnimSz);
+    sf::VertexArray vtx = sprSheet->setTextureSlice(pos.y, pos.y, index, 10);
+    printf( "Size of animation: %ld\n", vtx.getVertexCount());
+    animation.push_back( vtx );
     sf::Vector2f d = sf::Vector2f(Entities::CellSize , Entities::CellSize);
     
-    PlayerController* tempObj =  new PlayerController( pos, d, vtx, sprSheet->getTexture() , index);
+    PlayerController* tempObj =  new PlayerController( pos, d, animation , sprSheet->getTexture() , index , true , pAnimSz);
     /* ojo */
     playerControl = tempObj;
-    
+    playerCtrlPos = playerControl->getPosition();    
     ptr = std::make_shared<Object*>( tempObj );
 
-    playerCtrlPos = playerControl->getPosition();
     /* ojo */
-    if( ptr )
+    if( ptr != nullptr )
         playerExists = true;
     return ptr;
 }
@@ -46,7 +49,7 @@ void Entities::addEntity( entitiesType eT, sf::Vector2f pos, float angle ) {
         *  HasTexture    :->: bool;
         *  If has texture is false default vertex array, textureIndex -1 ; no texture; set rectangle shape
         */
-        Object* block = new Object( eT, p , sf::Vector2f( Entities::CellSize, Entities::CellSize ) , false, sf::VertexArray(), -1 ,nullptr);
+        Object* block = new Object( eT, p , sf::Vector2f( Entities::CellSize, Entities::CellSize ) , false, std::vector<sf::VertexArray>(), -1 ,nullptr, false, 0);
 
         sf::Color c =  sf::Color( sf::Color::Red );
         block->set_FillColor( c );
@@ -63,17 +66,23 @@ Object Entities::popEntity( sf::Vector2f pos ) {
 }
 //UPDATE ENTITIES IN UNORD-MAP: CALLING BASE METHOD UPDATE
 void Entities::updateEntities( float dt ) {
+    printf( "Post PlayerObject created\n");
     for( auto& en: entities ){
         Object* ent = *en.first;
         
-        if(ent->oData->hasCollider) {
+        printf( "\nBeep\n" );
+        if(ent->oData->hasCollider && playerExists) {
             if( ent->oData->type != playerControl->oData->type && playerControl->collider->CheckCollision( *ent->collider )){    
                 playerControl->set_move( playerControl->lookingDir.x*dt, playerControl->lookingDir.y*dt );
             }
         }
         ent->update( dt );
     }
-    playerCtrlPos = playerControl->get_position();
+    if( playerExists )
+        playerCtrlPos = playerControl->get_position();
+    else{
+        playerCtrlPos = sf::Vector2f( 0., 0.);
+    }
 }
 //HANDLE EVENTS ENTITIES IN UNORD-MAP: CALLING BASE METHOD HANDLEEVENTS
 void Entities::handleEvents( sf::Event e ){
@@ -85,9 +94,10 @@ void Entities::handleEvents( sf::Event e ){
 
 void Entities::drawEntities( sf::RenderTarget* target, sf::RenderStates& states){
     //states.texture = sprSheet->getTexture();
+    printf( "Print in entities draw func 93;\n" );
     for( auto& en: entities){
 		Object* o = *en.first;
-        //printf( " Drawing \n" ); 
+        printf( " Drawing \n" ); 
         o->drawCurrent(*target, states);
 	}
 }
@@ -103,4 +113,7 @@ void Entities::updatePlayerTiles( std::vector<int> t ){
 float Entities::getPlayerData( int datatype ) {
     if( datatype == 0 ) return playerControl->getPlayerAccel();
     else return 0.0;
+}
+bool Entities::doesPLayerExist(){
+    return playerExists;
 }

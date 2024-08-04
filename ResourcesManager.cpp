@@ -15,6 +15,7 @@ SpriteSheet::SpriteSheet( std::vector<std::vector<int>> arr, int w, int h ): def
     mTexture = new sf::Texture();
     setTileMap(arr);
     computeMap( arr );
+    //loadResources(arr);
 }
 void SpriteSheet::setTileMap( std::vector<std::vector<int>> arr ){
     tiles.clear();
@@ -23,6 +24,7 @@ void SpriteSheet::setTileMap( std::vector<std::vector<int>> arr ){
         j = 0;
         std::vector<Tile*> T;
         for( auto& a: ar){
+            printf( "%d ", a );
             bool col = false;
             if( a > 23 && a < 38)
                 col = true;
@@ -30,6 +32,7 @@ void SpriteSheet::setTileMap( std::vector<std::vector<int>> arr ){
             T.push_back(t);
             j++;
         }
+        printf( "\n" );
         i++;
         tiles.push_back(T);
     }
@@ -265,6 +268,16 @@ sf::VertexArray SpriteSheet::getTextureSlice( unsigned int index ) {
         return mBuffers[index];
     printf( "L269: mBuffer index oversized: %d\n", index );
     return mBuffers[mBuffers.size()-1];
+}
+std::vector<sf::VertexArray> SpriteSheet::setAnimationSlice(int x, int y, unsigned int& index, int tile, unsigned int animSz ){
+    unsigned int tmp = 0;
+    std::vector<sf::VertexArray> vctarr;
+    for( unsigned int i = 1; i < animSz; i++ ){
+        sf::VertexArray va = setTextureSlice( x , y , tmp, tile + i );
+        vctarr.push_back( va );
+    }
+    index = tmp;
+    return vctarr;
 }
 sf::Texture* SpriteSheet::getTexture( ) {
     return mTexture;

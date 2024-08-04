@@ -38,6 +38,7 @@ class Entities {
 
     void updatePlayerTiles( std::vector<int> );
 
+    bool doesPLayerExist();
     protected:
         sf::Vector2f        playerCtrlPos;
         

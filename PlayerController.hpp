@@ -8,7 +8,7 @@ static const sf::Color pColor = sf::Color( sf::Color::Red);
 class PlayerController: public Object {
     public:
         PlayerController();
-        PlayerController(sf::Vector2f pos , sf::Vector2f dim, sf::VertexArray vtx, sf::Texture* t, unsigned int ind );
+        PlayerController(sf::Vector2f pos , sf::Vector2f dim, std::vector<sf::VertexArray> vtx, sf::Texture* t, unsigned int ind , bool hAnim , unsigned int animSz );
         ~PlayerController();
 
         void            ColisionMovementUpdate( );

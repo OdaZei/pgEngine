@@ -15,7 +15,7 @@ class Object : public Node, public Transform {
 		ObjectData* 		oData;
 
 		Object( );
-		Object(int type, sf::Vector2f pos , sf::Vector2f dim , bool _hasTexture ,  sf::VertexArray _vArr = sf::VertexArray() , int _textureIndex = -1 , sf::Texture* s = nullptr );
+		Object(int type, sf::Vector2f pos , sf::Vector2f dim , bool _hasTexture ,  std::vector<sf::VertexArray> _vArr , int _textureIndex = -1 , sf::Texture* s = nullptr, bool hasTxs = false , unsigned int nTxs = 0);
 		~Object( );
 		
 		void set_move( float x, float y );
@@ -37,7 +37,9 @@ class Object : public Node, public Transform {
 		int getObjectType();
 
 		Collider* getCollider();
+
 		Collider* 			collider;
+		
 	protected:
 		sf::RectangleShape* shape;
 		
@@ -45,12 +47,11 @@ class Object : public Node, public Transform {
 
 		unsigned int 		textureVertexIndex;
 
-		sf::VertexArray 	vertexArr;
+		std::vector<sf::VertexArray> 	vertexArr;
 
 		sf::Texture* 		spritesheetTexture;
 		
 		bool 				hasAnimation;
 		unsigned int		nTextures;
-		unsigned int 		currentTexture;
-
+		mutable int 				currentTexture;
 };

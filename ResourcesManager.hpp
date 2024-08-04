@@ -36,6 +36,7 @@ class SpriteSheet {
 
         sf::VertexArray  getTextureSlice( unsigned int );
 
+        std::vector< sf::VertexArray > setAnimationSlice(int x, int y, unsigned int& index, int tile, unsigned int animSz );
         std::vector<std::vector<Tile*>>  tiles;
     protected:
         //Gets vertex 
