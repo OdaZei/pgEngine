@@ -10,7 +10,7 @@ WEM::WEM( ) {
         params:  /x pos origin /y pos origin /frequency /amplitude /lacunarity/persistence/Class SpriteSheet */
     World  wm = World(-120,-120,0.02f, 0.5,2.0, 0.5, sprSheet);
     
-    sf::Vector2f v = sf::Vector2f( 200  , 200 );
+    sf::Vector2f v = sf::Vector2f( 0  , 0 );
     
     woMan = std::make_unique<World>( wm );
     
@@ -29,18 +29,18 @@ void WEM::setTiles( int _x, int _y ) {
 }
 void WEM::update( float dt ) {
     woMan->getMapImage( 0 , 0 ,0, 0);
-    //enMan->updateEntities( dt );
+    enMan->updateEntities( dt );
 }
 void WEM::render( sf::RenderTarget* target ) {
     woMan->drawmap( target, states);
-    //enMan->drawEntities( target,states);   
+    enMan->drawEntities( target,states);   
 }
 void WEM::handleEvents( const sf::Event& e ) {
-    //enMan->handleEvents( e );
+    enMan->handleEvents( e );
 }
 sf::Vector2f WEM::getOrigin( ) {
-    //return enMan->getPlayerCtrlPos();
+    return enMan->getPlayerCtrlPos();
 }
 float WEM::getPlayerAccel( ){
-    //return enMan->getPlayerData( 0 );
+    return enMan->getPlayerData( 0 );
 }

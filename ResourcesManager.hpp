@@ -32,7 +32,7 @@ class SpriteSheet {
         
         //@> params : x , y , index , tile;
         // calls get vertex(arr) , saves it , modifies index reference, returns vertex(arr)
-        sf::VertexArray  setTextureSlice( int, int , unsigned int& , int);
+        bool  setTextureSlice( int, int , unsigned int& , int);
 
         sf::VertexArray  getTextureSlice( unsigned int );
 

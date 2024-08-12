@@ -72,7 +72,7 @@ void PlayerController::update( float dt ) {
     if( nearTiles.size() > 0 ){
         ColisionMovementUpdate();
     }
-    set_move(velocity.x * dt, velocity.y * dt); //Object->set_move;
+    set_move(velocity.x * dt, velocity.y * dt);
     collider->SetVertexAxis(get_position(), sf::Vector2f(2,2));
     velocity = acceleration ;
 }
@@ -87,18 +87,22 @@ void PlayerController::handleEvents( sf::Event e ) {
         if (e.key.code == sf::Keyboard::Left){
             acceleration.x = -accel;
             lookingDir.x = 1;
+            setCurrentTexture( 1 );
         }
         else if (e.key.code == sf::Keyboard::Right){
             acceleration.x = accel;
             lookingDir.x = -1;
+            setCurrentTexture( 0 );
         }
         else if (e.key.code == sf::Keyboard::Up){
             acceleration.y =- accel;
             lookingDir.y = 1;
+            setCurrentTexture( 3 );
         }
         else if (e.key.code == sf::Keyboard::Down){
             acceleration.y = accel;
             lookingDir.y =  -1;
+            setCurrentTexture( 2 );
         }else if (e.key.code == sf::Keyboard::P){
             accel += 0.10f;
         }else if (e.key.code == sf::Keyboard::O){

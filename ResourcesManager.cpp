@@ -24,7 +24,6 @@ void SpriteSheet::setTileMap( std::vector<std::vector<int>> arr ){
         j = 0;
         std::vector<Tile*> T;
         for( auto& a: ar){
-            printf( "%d ", a );
             bool col = false;
             if( a > 23 && a < 38)
                 col = true;
@@ -32,7 +31,6 @@ void SpriteSheet::setTileMap( std::vector<std::vector<int>> arr ){
             T.push_back(t);
             j++;
         }
-        printf( "\n" );
         i++;
         tiles.push_back(T);
     }
@@ -175,16 +173,15 @@ bool SpriteSheet::computeMap( std::vector<std::vector<int>> arr ) {
     loadResources(arr);
     return true;
 }
-
 sf::VertexArray SpriteSheet::getVertex( int _x, int _y, int tx, int ty ) {
     int x = _x - (defSprWidth/2);
     int y = _y - (defSprHeight/2);
     sf::VertexArray va;
     va.setPrimitiveType(sf::Triangles);
-    va.resize(nTriangles);
-
+    va.resize(nTriangles*defSprWidth);
+    printf( "Num of vertex: %d\n", va.getVertexCount());
     sf::Vertex* triangles = &va[nTriangles];
-    
+
     triangles[0].position = sf::Vector2f(x , y );
     triangles[1].position = sf::Vector2f((x + defSprWidth) , y );
     triangles[2].position = sf::Vector2f(x , (y + defSprHeight));
@@ -199,7 +196,6 @@ sf::VertexArray SpriteSheet::getVertex( int _x, int _y, int tx, int ty ) {
     triangles[4].texCoords = sf::Vector2f((tx + 1) * defSprWidth, ty * defSprHeight);
     triangles[5].texCoords = sf::Vector2f((tx + 1) * defSprWidth, (ty + 1) * defSprHeight);
    
-    printf( "%d, %d, %d, %d", x , y ,tx ,ty );
     return va;
 }
 //need to template 
@@ -255,27 +251,45 @@ void SpriteSheet::update( std::vector<std::vector<int>> arr , int w, int h ) {
 sf::VertexArray SpriteSheet::getTiles( ) {
     return mVertex;
 }
-sf::VertexArray SpriteSheet::setTextureSlice( int x, int y, unsigned int& index, int tile ){
+bool SpriteSheet::setTextureSlice( int x, int y, unsigned int& index, int tile ){
+    bool success = false;
+
     int tx, ty = 0;
     tx = tile % 16;
     ty = tile / 16;
-    mBuffers.push_back( getVertex( x , y , tx , ty ) );
-    index = mBuffers.size() - 1;
-    return mBuffers[index];
+
+    long int sz = mBuffers.size() - 1;
+    sf::VertexArray tmpArr = getVertex( x , y , tx , ty );
+    
+    if( tmpArr.getVertexCount( ) > 0 )
+        success = true;
+    
+    if( success ) {
+        mBuffers.push_back( tmpArr );
+        index = mBuffers.size() - 1;
+        if(index != 0 )
+            printf( "Got vertex index\n" );
+    }
+    
+    return success;
 }
 sf::VertexArray SpriteSheet::getTextureSlice( unsigned int index ) {
     if( index >= 0 && index < mBuffers.size() )
         return mBuffers[index];
-    printf( "L269: mBuffer index oversized: %d\n", index );
+
     return mBuffers[mBuffers.size()-1];
 }
 std::vector<sf::VertexArray> SpriteSheet::setAnimationSlice(int x, int y, unsigned int& index, int tile, unsigned int animSz ){
     unsigned int tmp = 0;
+
     std::vector<sf::VertexArray> vctarr;
-    for( unsigned int i = 1; i < animSz; i++ ){
-        sf::VertexArray va = setTextureSlice( x , y , tmp, tile + i );
-        vctarr.push_back( va );
+    
+    for( unsigned int i = 0; i < animSz; i++ ){
+        if(!setTextureSlice( x , y , tmp, tile + i ))
+            printf( "Resources_Error: Could not load texture: Fn() = setAnimationSlice()\n" );
+        vctarr.push_back( getTextureSlice( tmp ) );
     }
+    
     index = tmp;
     return vctarr;
 }

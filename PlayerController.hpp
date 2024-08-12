@@ -16,7 +16,7 @@ class PlayerController: public Object {
         virtual void    update( float dt ) ;
         //virtual void            drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
         virtual void    handleEvents( sf::Event e ) ;
-
+        
         void            updateNearTile( std::vector<int> );
         float           getPlayerAccel();
 

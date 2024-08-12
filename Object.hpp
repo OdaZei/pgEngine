@@ -32,26 +32,30 @@ class Object : public Node, public Transform {
 		virtual void update( float dt );
 		virtual void handleEvents( sf::Event e);
 
+		void setCurrentTexture( unsigned int );
+
 		//void setObjectType( int t );
 		
 		int getObjectType();
 
 		Collider* getCollider();
 
+		bool checkAnimationPreset( unsigned int );
+
 		Collider* 			collider;
 		
 	protected:
-		sf::RectangleShape* shape;
+		sf::RectangleShape* 			shape;
 		
-		bool 				hasTexture;
+		bool 							hasTexture;
 
-		unsigned int 		textureVertexIndex;
+		unsigned int 					textureVertexIndex;
 
 		std::vector<sf::VertexArray> 	vertexArr;
 
-		sf::Texture* 		spritesheetTexture;
+		sf::Texture* 					spritesheetTexture;
 		
-		bool 				hasAnimation;
-		unsigned int		nTextures;
-		mutable int 				currentTexture;
+		bool 							hasAnimation;
+		unsigned int					nTextures;
+		mutable int 					currentTexture;
 };

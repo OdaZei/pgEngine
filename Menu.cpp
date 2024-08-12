@@ -23,16 +23,12 @@ void Menu::addData( int x, int y, char arr[32] ) {
     mData.push_back(std::make_shared<menudata>(md));
     TextHolder  th =  TextHolder( arr, 12, x, y );
     mElm.push_back(std::make_shared<TextHolder>(th));
-    printf( "AD: aadded succesfully %ld\n", mElm.size());
 }
 void Menu::overrideData( int index, char d[32] ) {
-    //menudata* data = *mData[index];
-    printf( "OD: Send: %s, got saved size: %s\n" ,d, (*mData[0]).data);
     menudata MD = *(mData[dataFSize()-1]);
     strcpy(MD.data, d);
     TextHolder th = *mElm[dataFSize()-1];
     th.updateC(d);    
-    printf( "%s\n" , MD.data );
 }
 // update with float data;
 void Menu::update( float dt ) const{
@@ -45,7 +41,6 @@ void Menu::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
     for( auto& me: mElm ) {
         TextHolder t = *me;
         std::string s = t.getText();
-        printf( "m1 Drawing:%s\n--------------------------------\n", s.c_str());
         t.drawCurrent(target, states);
     }
 }

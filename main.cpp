@@ -1,10 +1,9 @@
 #include "include/StartServicesState.hpp"
+
 #include "include/EventManager.hpp"
 
-
-
 int main(int argc, char **argv){
-	StartServicesState* ssState_ = new StartServicesState(); //Initializing services window, res, entities,;
+	StartServicesState* ssState_ = new StartServicesState(); 
 	sf::Clock Clock;
 	while( ssState_->isWindowOpen() ) {
 		ssState_->handleEvents();

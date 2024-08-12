@@ -1,5 +1,14 @@
 #include "include/Object.hpp"
 #include <cstdio>
+
+/*
+	Object ( ) : PARAMS :
+		TYPE( INT ) : OBJECT TYPE, DEFINED ON ENTITYMANAGER, STORING FOR FUTURE USE;
+			MODIFY TO UNSIGNED INT, CASE NEGATIVE TYPE IS SET;
+		POS ( SF:VECTOR2F )  : DEFINING OBJECT STARTING POSITION.
+		DIM ( SF::VECTOR2F ) : DEFINING OBJECT DIMENSIONS( WORLD UNITS ; MAYBE 16 BITS  = 1 WORLD UNIT );
+*/
+
 Object::Object(): oData(nullptr), shape(nullptr) {
 	Transform();
 	Node();
@@ -70,6 +79,7 @@ void Object::set_move( float x, float y ){
 	}else if( hasTexture ){
 		cnt = 0;
 	}
+	//Temporal clamp animation to Transform;
 	/*
 	for( int i = 0 ; i < vertexArr[cnt].getVertexCount(); i++ ) {
 		sf::Vertex* v = &vertexArr[cnt][i];
@@ -99,31 +109,37 @@ sf::RectangleShape Object::getShape( ) {
 }
 unsigned int ct = 0;
 void Object::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const{
-	//states.transform *= getTransform();
-	printf( "Post PlayerObject created\n");
-	printf( "Running Object Draw, SIZE OF VERTEX ARR: %ld\n", vertexArr.size());
+	
 	target.draw( collider->colliderAxis , states );
-	/*
+
+	states.transform *= getTransform();
+	//printf( "Post PlayerObject created\n");
 	if( hasTexture ){
 		states.texture = spritesheetTexture;
 		if( hasAnimation ){
-			target.draw( vertexArr[0] , states );
+			target.draw( vertexArr[currentTexture] , states );
 		}else{
-			target.draw( vertexArr[0], states);	
+			target.draw( vertexArr[currentTexture], states );	
 		}
-	}else
-	*/
-	target.draw( *shape , states );
+	}else{
+		target.draw( *shape , states );
+	}
 }
 void Object::update( float dt )  {}
 void Object::handleEvents( sf::Event e) {
+}
+void Object::setCurrentTexture( unsigned int u ){
+	if( checkAnimationPreset( u ) )
+		currentTexture = u;
 }
 /*
 void Object::setObjectType( int t ) {
 	type = t;
 }
 */
-
+bool Object::checkAnimationPreset( unsigned int u ){
+	return ( hasAnimation && ( u < nTextures ));
+}
 int Object::getObjectType( ) {
 	return oData->type;
 }

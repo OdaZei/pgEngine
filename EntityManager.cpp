@@ -14,14 +14,18 @@ Entities::~Entities(){}
 std::shared_ptr<Object*> Entities::addPlayerController( sf::Vector2f pos ) {
     
     std::shared_ptr<Object*> ptr = nullptr;
-    unsigned int index = 0;
-    unsigned int pAnimSz = 1;
+    unsigned int index = 34;
+    unsigned int pAnimSz = 4;
     // #64 -> player texture;
     /*Debug*/
-    std::vector<sf::VertexArray> animation; //= sprSheet->setAnimationSlice(pos.x, pos.y, index, 64, pAnimSz);
-    sf::VertexArray vtx = sprSheet->setTextureSlice(pos.y, pos.y, index, 10);
-    printf( "Size of animation: %ld\n", vtx.getVertexCount());
+    std::vector<sf::VertexArray> animation = sprSheet->setAnimationSlice(pos.x, pos.y, index, 64, pAnimSz);
+    /*
+    if( sprSheet->setTextureSlice(pos.y, pos.y, index, 64)) 
+        printf( "TextureSlice Index: %d\n", index);
+    sf::VertexArray vtx = sprSheet->getTextureSlice( index );
+    
     animation.push_back( vtx );
+    */
     sf::Vector2f d = sf::Vector2f(Entities::CellSize , Entities::CellSize);
     
     PlayerController* tempObj =  new PlayerController( pos, d, animation , sprSheet->getTexture() , index , true , pAnimSz);
@@ -66,11 +70,11 @@ Object Entities::popEntity( sf::Vector2f pos ) {
 }
 //UPDATE ENTITIES IN UNORD-MAP: CALLING BASE METHOD UPDATE
 void Entities::updateEntities( float dt ) {
-    printf( "Post PlayerObject created\n");
+    //printf( "Post PlayerObject created\n");
     for( auto& en: entities ){
         Object* ent = *en.first;
         
-        printf( "\nBeep\n" );
+        //printf( "\nBeep\n" );
         if(ent->oData->hasCollider && playerExists) {
             if( ent->oData->type != playerControl->oData->type && playerControl->collider->CheckCollision( *ent->collider )){    
                 playerControl->set_move( playerControl->lookingDir.x*dt, playerControl->lookingDir.y*dt );
@@ -93,11 +97,10 @@ void Entities::handleEvents( sf::Event e ){
 }
 
 void Entities::drawEntities( sf::RenderTarget* target, sf::RenderStates& states){
-    //states.texture = sprSheet->getTexture();
-    printf( "Print in entities draw func 93;\n" );
+    // /states.texture = sprSheet->getTexture();
     for( auto& en: entities){
 		Object* o = *en.first;
-        printf( " Drawing \n" ); 
+        //printf( " Drawing \n" ); 
         o->drawCurrent(*target, states);
 	}
 }
