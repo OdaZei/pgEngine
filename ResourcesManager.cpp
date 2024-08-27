@@ -25,7 +25,7 @@ void SpriteSheet::setTileMap( std::vector<std::vector<int>> arr ){
         std::vector<Tile*> T;
         for( auto& a: ar){
             bool col = false;
-            if( a > 23 && a < 38)
+            if( a >= 23 && a < 38)
                 col = true;
             Tile* t = new Tile( a, i, j, false, col );
             T.push_back(t);
@@ -179,7 +179,6 @@ sf::VertexArray SpriteSheet::getVertex( int _x, int _y, int tx, int ty ) {
     sf::VertexArray va;
     va.setPrimitiveType(sf::Triangles);
     va.resize(nTriangles*defSprWidth);
-    printf( "Num of vertex: %d\n", va.getVertexCount());
     sf::Vertex* triangles = &va[nTriangles];
 
     triangles[0].position = sf::Vector2f(x , y );
@@ -227,6 +226,7 @@ bool SpriteSheet::loadResources( std::vector<std::vector<int>> arr) {
     }
     return true;
 }
+//CAlled By WorldManager to retrieve the closest 8 tiles + position;
 std::vector<int> SpriteSheet::getnearestTiles(int x, int y, std::vector<Tile*>& ts){
     std::vector<int> corners( 9 , 0 );
     int cX = tWidth / 2;

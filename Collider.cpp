@@ -4,27 +4,26 @@
 int times   = 0 ;
 sf::Vector2f dimDiff   = sf::Vector2f(0,0);
 
-Collider::Collider( ): Transform( v( ), v( )), colliderAxis(sf::VertexArray( sf::Points, 7 )) { 
+Collider::Collider( ): colliderAxis(sf::VertexArray( sf::Points, 7 )) { 
 
 }
-Collider::Collider( v pos, v dim ): Transform(v( pos ), v( dim ))\
-    , colliderAxis( sf::VertexArray( sf::Points, 7 ) ){
-    v halfDim = v( dim.x/2 , dim.y/2 );
-    v A = v(pos.x - halfDim.x, pos.y );
-    v B = v(pos.x + halfDim.x , pos.y);
-    v C = v(pos.x , pos.y - halfDim.y);
-    v D = v(pos.x , pos.y + halfDim.y);
+Collider::Collider( sf::Vector2f pos, sf::Vector2f dim ): colliderAxis( sf::VertexArray( sf::Points, 7 ) ){
+    sf::Vector2f halfDim = sf::Vector2f( dim.x/2 , dim.y/2 );
+    sf::Vector2f A = sf::Vector2f(pos.x - halfDim.x, pos.y );
+    sf::Vector2f B = sf::Vector2f(pos.x + halfDim.x , pos.y);
+    sf::Vector2f C = sf::Vector2f(pos.x , pos.y - halfDim.y);
+    sf::Vector2f D = sf::Vector2f(pos.x , pos.y + halfDim.y);
     //v Ix = v(pos.x , pos.y);
     //v Iy = v(pos.x , pos.y );
 
     
-    colliderAxis[0] = v( pos.x, pos.y);
+    colliderAxis[0] = sf::Vector2f( pos.x, pos.y);
     colliderAxis[1] = A;
     colliderAxis[2] = B;
     colliderAxis[3] = C;
     colliderAxis[4] = D;
-    colliderAxis[5].position = v();
-    colliderAxis[6].position = v();
+    colliderAxis[5].position = sf::Vector2f();
+    colliderAxis[6].position = sf::Vector2f();
 
 }
 Collider::~Collider( ) {
@@ -34,17 +33,17 @@ float Det(float a, float b, float c, float d){
 	return a*d - b*c;
 }
 void Collider::SetVertexAxis( sf::Vector2f pos, sf::Vector2f dim ) {
-    v halfDim = v( dim.x/2 , dim.y/2  );
-    colliderAxis[0].position = v( pos.x, pos.y);colliderAxis[0].color = sf::Color::White;
-    colliderAxis[1].position = v(pos.x - halfDim.x, pos.y );colliderAxis[1].color = sf::Color::Green;//Left
-    colliderAxis[2].position = v(pos.x + halfDim.x , pos.y);colliderAxis[2].color = sf::Color::Blue;//Right
-    colliderAxis[3].position = v(pos.x , pos.y - halfDim.y);colliderAxis[3].color = sf::Color::Red;//Top
-    colliderAxis[4].position = v(pos.x , pos.y + halfDim.y);colliderAxis[4].color = sf::Color::White;//Down
+    sf::Vector2f halfDim = sf::Vector2f( dim.x/2 , dim.y/2  );
+    colliderAxis[0].position = sf::Vector2f( pos.x, pos.y);colliderAxis[0].color = sf::Color::White;
+    colliderAxis[1].position = sf::Vector2f(pos.x - halfDim.x, pos.y );colliderAxis[1].color = sf::Color::Green;//Left
+    colliderAxis[2].position = sf::Vector2f(pos.x + halfDim.x , pos.y);colliderAxis[2].color = sf::Color::Blue;//Right
+    colliderAxis[3].position = sf::Vector2f(pos.x , pos.y - halfDim.y);colliderAxis[3].color = sf::Color::Red;//Top
+    colliderAxis[4].position = sf::Vector2f(pos.x , pos.y + halfDim.y);colliderAxis[4].color = sf::Color::White;//Down
     colliderAxis[5].color = sf::Color::Yellow;
     colliderAxis[6].color = sf::Color::Cyan;
 }
 
-bool Collider::IntersectionBetweenLines( v A_p1, v A_p2, v B_p1, v B_p2 , float& ixOut, float& iyOut ) {
+bool Collider::IntersectionBetweenLines( sf::Vector2f A_p1, sf::Vector2f A_p2, sf::Vector2f B_p1, sf::Vector2f B_p2 , float& ixOut, float& iyOut ) {
 
     float detL1 = Det(A_p1.x, A_p1.y, A_p2.x, A_p2.y);
 	float detL2 = Det(B_p1.x, B_p1.y, B_p2.x, B_p2.y);
@@ -72,42 +71,42 @@ bool Collider::IntersectionBetweenLines( v A_p1, v A_p2, v B_p1, v B_p2 , float&
 
 bool Collider::CheckCollision(Collider& other) {
 
-    v pos = get_position();
-    v dim = get_dimension();
+    sf::Vector2f pos = colliderAxis[0].position;
+    sf::Vector2f dim = sf::Vector2f(colliderAxis[2].position.x - colliderAxis[0].position.x, colliderAxis[4].position.y - colliderAxis[0].position.y);
 
-    v pOther = other.get_position();
-    v dOther = other.get_dimension();
+    sf::Vector2f pOther = other.colliderAxis[0].position;
+    sf::Vector2f dOther = sf::Vector2f(other.colliderAxis[2].position.x - other.colliderAxis[0].position.x, other.colliderAxis[4].position.y - other.colliderAxis[0].position.y);
     
-    v halfDim = v( dim.x/2 , dim.y/2 );
+    sf::Vector2f halfDim = sf::Vector2f( dim.x/2 , dim.y/2 );
     
     
     
-    v A = v(pos.x - halfDim.x, pos.y );
-    v B = v(pos.x + halfDim.x , pos.y);
-    v C = v(pos.x , pos.y - halfDim.y);
-    v D = v(pos.x , pos.y + halfDim.y);
-    //printf( "Line section: C:x[ %f ], y:[ %f ], D:x[ %f ], y:[ %f ]\n[", C.x , C.y, D.x, D.y );
-    dimDiff = v(halfDim.x, halfDim.y);
-    halfDim = v(dOther.x/2, dOther.y/2 );
+    sf::Vector2f A = sf::Vector2f(pos.x - halfDim.x, pos.y );
+    sf::Vector2f B = sf::Vector2f(pos.x + halfDim.x , pos.y);
+    sf::Vector2f C = sf::Vector2f(pos.x , pos.y - halfDim.y);
+    sf::Vector2f D = sf::Vector2f(pos.x , pos.y + halfDim.y);
+    printf( "Line section: C:x[ %f ], y:[ %f ], D:x[ %f ], y:[ %f ]\n[", C.x , C.y, D.x, D.y );
+    dimDiff = sf::Vector2f(halfDim.x, halfDim.y);
+    halfDim = sf::Vector2f(dOther.x/2, dOther.y/2 );
      // test pos 0 , 0
-    v O = v(pOther.x - halfDim.x, pOther.y); // 
-    v P = v(pOther.x + halfDim.x, pOther.y);
-    v Q = v(pOther.x , pOther.y - halfDim.y);
-    v R = v(pOther.x , pOther.y + halfDim.y);
-    dimDiff = v(dim.x + dimDiff.x, dim.y + dimDiff.y);
+    sf::Vector2f O = sf::Vector2f(pOther.x - halfDim.x, pOther.y); // 
+    sf::Vector2f P = sf::Vector2f(pOther.x + halfDim.x, pOther.y);
+    sf::Vector2f Q = sf::Vector2f(pOther.x , pOther.y - halfDim.y);
+    sf::Vector2f R = sf::Vector2f(pOther.x , pOther.y + halfDim.y);
+    dimDiff = sf::Vector2f(dim.x + dimDiff.x, dim.y + dimDiff.y);
 
     float e , r = 0;
     bool t1 , t2 = false;
     if( (IntersectionBetweenLines( C , D , O, P , e ,r ))){
         if( ( e > O.x && e < P.x  ) ){
-            colliderAxis[5].position = v(e,r);
+            colliderAxis[5].position = sf::Vector2f(e,r);
             t1 = true;
         }
     }
     e , r = 0;
     if(IntersectionBetweenLines( A , B , Q , R , e ,r )){
         if(  (r > Q.y && r < R.y) ){
-            colliderAxis[6].position = v(e, r );
+            colliderAxis[6].position = sf::Vector2f(e, r );
             t2 = true;
         }
     }

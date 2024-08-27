@@ -8,14 +8,13 @@
     R ->  1 , 0
     D ->  0 ,-1
 */
-PlayerController::PlayerController( ): Object( 0, sf::Vector2f( 20 , 20) , sf::Vector2f( 8, 8), false, std::vector<sf::VertexArray>(), -1 , nullptr), lookingDir(sf::Vector2f(0, -1)), velocity(sf::Vector2f()) {
+PlayerController::PlayerController( ): Object( 0, sf::Vector2f( 20 , 20) , sf::Vector2f( 8, 8), false, std::vector<sf::VertexArray>(), -1 , nullptr), lookingDir(sf::Vector2f(0, -1)), acceleration(sf::Vector2f(0,0)), velocity(sf::Vector2f(0,0)) {
     set_FillColor( pColor );
     vA = sf::VertexArray(sf::Lines, 8 );
 }
-PlayerController::PlayerController(sf::Vector2f pos , sf::Vector2f dim, std::vector<sf::VertexArray> vtx, sf::Texture* s, unsigned int ind , bool hAnim , unsigned int animSz ): Object(0, pos , dim , true, vtx, (int)ind, s, hAnim , animSz), lookingDir(sf::Vector2f(0, -1)), velocity(sf::Vector2f()) {
-    Transform(pos, dim);
-    
+PlayerController::PlayerController(sf::Vector2f pos , sf::Vector2f dim, std::vector<sf::VertexArray> vtx, sf::Texture* s, unsigned int ind , bool hAnim , unsigned int animSz ): Object(0, pos , dim , true, vtx, (int)ind, s, hAnim , animSz), lookingDir(sf::Vector2f(0, -1)),acceleration(sf::Vector2f(0,0)), velocity(sf::Vector2f(0,0)) {
     vA = sf::VertexArray(sf::Lines, 8 );
+    printf( "pos at entities: %f, %f\n", pos.x, pos.y );
 }
 PlayerController::~PlayerController(){
 
@@ -28,7 +27,7 @@ void PlayerController::ColisionMovementUpdate( ){
     //  1 3 5 7
     sf::Vector2f p = get_position();
     for( int i = 1; i < 8; i+=2, c++ ){
-        if( c == 0 && nearTiles[i] == 23 ){
+        if( c == 0 && nearTiles[i] > 18 ){
             vA[0].position = sf::Vector2f( p.x  , p.y );
             vA[0].color = sf::Color(255,0,0,255);
             vA[1].position = sf::Vector2f( p.x  , p.y - 8 );
@@ -37,7 +36,7 @@ void PlayerController::ColisionMovementUpdate( ){
             acceleration.y =  accel/2; 
             //velocity.y = 0 ;
         }
-        if( c == 3 && nearTiles[i] == 23 ){
+        if( c == 3 && nearTiles[i] > 18 ){
             vA[6].position = sf::Vector2f( p.x  , p.y );
             vA[6].color = sf::Color(255,0,0,255);
             vA[7].position = sf::Vector2f( p.x  , p.y + 8 );
@@ -46,7 +45,7 @@ void PlayerController::ColisionMovementUpdate( ){
             acceleration.y = -accel/2; 
             //velocity.y = 0;
         }
-        if( c == 1 && nearTiles[i] == 23 ){
+        if( c == 1 && nearTiles[i] > 18 ){
             vA[2].position = sf::Vector2f( p.x  , p.y );
             vA[2].color = sf::Color(255,0,0,255);
             vA[3].position = sf::Vector2f( p.x - 8 , p.y );
@@ -55,7 +54,7 @@ void PlayerController::ColisionMovementUpdate( ){
             acceleration.x = accel/2; 
             //velocity.x = 0;
         }
-        if( c == 2 && nearTiles[i] == 23 ){
+        if( c == 2 && nearTiles[i] > 18 ){
             vA[4].position = sf::Vector2f( p.x  , p.y );
             vA[4].color = sf::Color(255,0,0,255);
             vA[5].position = sf::Vector2f( p.x  + 8, p.y );
@@ -69,18 +68,15 @@ void PlayerController::ColisionMovementUpdate( ){
 void PlayerController::update( float dt ) {
     sf::Vector2f v;
     //Check if collisions against near tiles; ( debug : checking if 1 or more colisions detected)
+    /*
     if( nearTiles.size() > 0 ){
         ColisionMovementUpdate();
     }
+    */
     set_move(velocity.x * dt, velocity.y * dt);
-    collider->SetVertexAxis(get_position(), sf::Vector2f(2,2));
+    collider->SetVertexAxis(get_position(), sf::Vector2f(4,4));
     velocity = acceleration ;
 }
-/*
-void PlayerController::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const {
-    
-}
-*/
 void PlayerController::handleEvents( sf::Event e ) {
     //int speed = 10 ;
     if (e.type == sf::Event::KeyPressed){
@@ -124,6 +120,7 @@ void PlayerController::handleEvents( sf::Event e ) {
             lookingDir = sf::Vector2f(0,0);
         }
     }
+    velocity = acceleration ;
 }
 void PlayerController::updateNearTile( std::vector<int> t ){
     nearTiles = t;

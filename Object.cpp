@@ -10,17 +10,13 @@
 */
 
 Object::Object(): oData(nullptr), shape(nullptr) {
-	Transform();
+	//Transform();
 	Node();
 	shape = new sf::RectangleShape( );
-	oData = new ObjectData(-1, false, false );
+	oData = new ObjectData();
 
 	collider 	= new Collider();
-	hasTexture 	= false;
-	
 	spritesheetTexture  = nullptr;
-	hasAnimation 		= false;
-	nTextures			= 0;
 	currentTexture		= 0;
 	vertexArr 			= std::vector<sf::VertexArray>();
 }
@@ -30,31 +26,29 @@ Object::Object(): oData(nullptr), shape(nullptr) {
 	** _vArr -> is passed as default
 */
 Object::Object( int type, sf::Vector2f pos, sf::Vector2f dim , bool _hasTexture, std::vector<sf::VertexArray> _vArr, int _textureIndex, sf::Texture* s, bool hasTxs, unsigned int nTxs): shape(nullptr), collider(nullptr),oData(nullptr) {
-	Transform( pos, dim );
-	Transform::setPosition( pos );
+	//Transform( pos, dim );
 	Node(); // Creates Drawable node;
 	// Case static texture;
 	if( _hasTexture && _textureIndex > -1 ) {
 		vertexArr  = _vArr;
-		hasTexture =  _hasTexture;
 		textureVertexIndex = _textureIndex;
 		spritesheetTexture = s;
 		if( hasTxs ){
-			hasAnimation  = hasTxs;
 			if( nTxs > 0 ){
-				nTextures = nTxs;
 				//Start animation from index 0;
 				currentTexture = 0; 
 			}else{
 				//Set static textures if nTxs( number of textures ) == 0;
-				hasAnimation = false;
-				nTextures = 0;
+				hasTxs = false;
+				nTxs = 0;
 				currentTexture = 0;
 			}
 		}
 	}else {
 		//Case no Texture;
-		hasTexture = false;
+		_hasTexture = false;
+		hasTxs 		= false;
+		nTxs   		= 0;
 		shape = new sf::RectangleShape( );
 		shape->setPosition( pos );
 		shape->setSize( dim );
@@ -62,36 +56,24 @@ Object::Object( int type, sf::Vector2f pos, sf::Vector2f dim , bool _hasTexture,
 	}
 	//set has collider and canMove
 	if(type != 0 ){
-		oData = new ObjectData(type, false, false );
+		oData = new ObjectData(type, true, false, _hasTexture, hasTxs, nTxs );
 	}else{
-		oData = new ObjectData(type, true, true );
+		oData = new ObjectData(type, true, true , _hasTexture, hasTxs, nTxs );
 	}
-	collider = new Collider( pos, dim );
+	if(oData->has_collider)
+		collider = new Collider( pos, dim );
 }
 Object::~Object(){}
 void Object::set_move( float x, float y ){
-	Move( x, y );
-	collider->Move(x,y);
-	
-	unsigned int cnt = 0;
-	if( hasTexture && hasAnimation ){
-		cnt = currentTexture;
-	}else if( hasTexture ){
-		cnt = 0;
-	}
-	//Temporal clamp animation to Transform;
-	/*
-	for( int i = 0 ; i < vertexArr[cnt].getVertexCount(); i++ ) {
-		sf::Vertex* v = &vertexArr[cnt][i];
-		v->position.x += x;
-		v->position.y += y;
-	}
-	*/
+	if( oData->can_move )
+		Move( x, y );
 }
 void Object::set_position( float x, float y ) {
-	Transform::setPosition( x, y );
-	shape->setPosition( x, y );
-	collider->setPosition( x, y);
+	setPosition( x, y );
+	if(!oData->has_texture)
+		shape->setPosition( x, y );
+	
+	
 }
 void Object::set_rotation( int angle ) {
 	setRotation( float(angle) );
@@ -110,13 +92,11 @@ sf::RectangleShape Object::getShape( ) {
 unsigned int ct = 0;
 void Object::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const{
 	
-	target.draw( collider->colliderAxis , states );
-
-	states.transform *= getTransform();
-	//printf( "Post PlayerObject created\n");
-	if( hasTexture ){
+	states.transform *= getTransf();
+	
+	if( oData->has_texture ){
 		states.texture = spritesheetTexture;
-		if( hasAnimation ){
+		if( oData->has_animation ){
 			target.draw( vertexArr[currentTexture] , states );
 		}else{
 			target.draw( vertexArr[currentTexture], states );	
@@ -124,6 +104,7 @@ void Object::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) co
 	}else{
 		target.draw( *shape , states );
 	}
+	target.draw( collider->colliderAxis );
 }
 void Object::update( float dt )  {}
 void Object::handleEvents( sf::Event e) {
@@ -132,13 +113,8 @@ void Object::setCurrentTexture( unsigned int u ){
 	if( checkAnimationPreset( u ) )
 		currentTexture = u;
 }
-/*
-void Object::setObjectType( int t ) {
-	type = t;
-}
-*/
 bool Object::checkAnimationPreset( unsigned int u ){
-	return ( hasAnimation && ( u < nTextures ));
+	return ( oData->has_animation && ( u < oData->num_textures ));
 }
 int Object::getObjectType( ) {
 	return oData->type;

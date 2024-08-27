@@ -5,12 +5,14 @@ char arr[32] {"Menu or so"};
 
 GameState::GameState(): EngineState(2), gState_( nullptr ), weM(nullptr) ,camera(nullptr), uiman(nullptr), menuIsOpen(false), menuIndex(-1) {
     weM = new WEM();
-    sf::Vector2f cameraScale = sf::Vector2f( 200 , 200 );
+
+    // Setting window scale, throught the camera viewport;
+    sf::Vector2f cameraScale = sf::Vector2f( 80 , 80 );
     camera = new Camera(0,0,cameraScale.x,cameraScale.y, true, -cameraScale.x,-cameraScale.y, 256, 256);
-    //sf::Vector2f view = camera->getViewSize();
+    
     uiman = new UiManager(0,0, 480, 480);
+    
     menuIndex = uiman->addMenu( 340 , 240 , arr);
-    uiman->updateC(1 , arr );
     menuIsOpen = true;
 }
 std::shared_ptr<UiElement*> menu;
@@ -30,25 +32,22 @@ void GameState::update( float dt ) {
 
     weM->update( dt );
     uiman->updateF(0,dt); // update fps text;};
+    
     //Update corrdinate text
     char arr2[32];
     sprintf(arr2, "X:%0.1f,Y:%0.1f,Z:%0.1f",weM->getOrigin().x, weM->getOrigin().y, 1.f );
     uiman->updateTC(1, arr2);
-    //uiman->updateC(1,arr);
+    sprintf( arr, "Tick: %.4f", dt );
+    uiman->updateC(1,arr);
     
-    char arr1[32] {"Maybe!"};
-    //uiman->updateC( 0,arr1);
+    char arr1[32];
     sprintf(arr1, "Accel: %0.5f", weM->getPlayerAccel());
-    //sprintf(arr1, "Accel: %0.5f", 0.0f);
     uiman->updateC( 1,arr1);
     
     camera->moveCamera( weM->getOrigin().x  , weM->getOrigin().y  , dt);
-    //camera->moveCamera( 0  , 0 , dt);
     
 }
 void GameState::render( sf::RenderTarget* target) {
-    // sf::Vector2f  dView = camera->getViewSize();
-
     target->setView( camera->getCamera() );
     weM->render( target );
 
