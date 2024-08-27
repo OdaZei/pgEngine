@@ -10,30 +10,38 @@
 
 //Defining visible portion, and dimension we will be rendering;
 
-const unsigned int W  = 64;
-const unsigned int H  = 64;
+const unsigned int W  = 16;
+const unsigned int H  = 16;
 
-const unsigned int CW = 32;
-const unsigned int CH = 32;
+const unsigned int CW = 16;
+const unsigned int CH = 16;
 
 class World {
     public:
-        World();
-        World(float xOrigin, float yOrigin,float freq, float ampl, float lac, float pers);
+        World( SpriteSheet *);
+
+        World(float, float,float, float, float, float, SpriteSheet *);
+        
         ~World();
-        bool buildImage(size_t octaves, unsigned int shiftX, unsigned int shiftY);
-        bool getMapImage( int, int, float, float);
+        
+        bool buildImage(size_t , unsigned int , unsigned int, unsigned int);
+        bool getMapImage( int, int, float, float, int);
         bool updateWorldView( int, int ); 
         bool pixelsToSpriteImage(std::vector<std::vector<int>> pixels);
+        
         void drawmap(sf::RenderTarget* , sf::RenderStates);
+        
+        std::vector<int> getTile(int,int,Collider);
+
     protected:
         std::vector<std::vector<int>> pixelToId;
     private:
         //@Debug
-        sf::Vector2f    origin;
-        sf::Image       displaymap;
-        sf::Texture     tex;
-        sf::Sprite      spr;
-        SimplexNoise*   generator;
-        SpriteSheet*    sprSheet;
+        sf::Vector2f        origin;
+        sf::Image           displaymap;
+        sf::Texture         tex;
+        sf::Sprite          spr;
+        SimplexNoise*       generator;
+        SpriteSheet*        sprSheet;
+        sf::Transformable   transform;
 };

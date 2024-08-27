@@ -59,3 +59,25 @@ main
 * Add Ui Manager :
 **stack ui node* element : currently text**
 **default ui view as camera class**
+
+
+
+
+2 / 08 / 24
+
+
+Currently loading one of the frames of animations
+
+saving vertex rray and its index , as a vertex Buffer;
+
+
+****************
+
+
+**menu set up:**
+main buttons:
+inspect: oppends info of selected object;
+instantiate: create gameobject ( creative-menu );
+
+fps -> 0, 0;
+player coordinates -> 100, 0;

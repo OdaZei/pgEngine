@@ -1,21 +1,31 @@
 #pragma once
+
 #include "Object.hpp"
+#include "ResourcesManager.hpp"
 
 static const sf::Color pColor = sf::Color( sf::Color::Red);
+
 class PlayerController: public Object {
     public:
         PlayerController();
-        PlayerController(sf::Vector2f pos , sf::Vector2f dim);
+        PlayerController(sf::Vector2f pos , sf::Vector2f dim, std::vector<sf::VertexArray> vtx, sf::Texture* t, unsigned int ind , bool hAnim , unsigned int animSz );
         ~PlayerController();
-        //FROM OBJECT::UPDATE
-        virtual void update( float dt ) ;
-        void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
-        //FROM OBJEC::HANDLEEVENTS
-        virtual void handleEvents( sf::Event e ) ;
 
-        sf::Vector2f lookingDir;
+        void            ColisionMovementUpdate( );
+
+        virtual void    update( float dt ) ;
+        //virtual void            drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
+        virtual void    handleEvents( sf::Event e ) ;
+        
+        void            updateNearTile( std::vector<int> );
+        float           getPlayerAccel();
+
+        sf::Vector2f        lookingDir;
+    protected:
+        float               accel = 14.0f;
     private:
-        //CURRENT VELOCITY VALUE
-        sf::Vector2f velocity {0,0};
-        //PLAYER LOOKING DIRECTION
+        sf::VertexArray     vA;
+        std::vector<int>    nearTiles;
+        sf::Vector2f        acceleration;
+        sf::Vector2f        velocity;
 };

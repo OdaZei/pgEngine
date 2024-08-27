@@ -3,7 +3,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include "Transform.hpp"
 
-class Collider: public Transform {
+class Collider {
     public:
         Collider();
         Collider( sf::Vector2f pos , sf::Vector2f dim );

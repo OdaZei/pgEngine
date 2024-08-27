@@ -2,9 +2,10 @@
 
 
 #include "EngineState.hpp"
-#include "EntityManager.hpp"
-#include "WorldManager.hpp"
+#include "WEManager.hpp"
 #include "Camera.hpp"
+#include "UiManager.hpp"
+
 
 class GameState: public EngineState {
     public:
@@ -20,8 +21,7 @@ class GameState: public EngineState {
     private:
         GameState* gState_;
         
-        Entities*   entManager;
-        World*      world;
+        WEM*        weM;
         Camera*     camera;
-        Camera*     miniMap;
+        UiManager * uiman;
 };

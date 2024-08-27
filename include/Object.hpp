@@ -4,13 +4,18 @@
 #include "Node.hpp"
 #include "Collider.hpp"
 #include "ObjectData.hpp"
+
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 class Object : public Node, public Transform {
 	public:
+		
+		ObjectData* 		oData;
+
 		Object( );
-		Object(int type, sf::Vector2f pos, sf::Vector2f dim );
+		Object(int type, sf::Vector2f pos , sf::Vector2f dim , bool _hasTexture ,  std::vector<sf::VertexArray> _vArr , int _textureIndex = -1 , sf::Texture* s = nullptr, bool hasTxs = false , unsigned int nTxs = 0);
 		~Object( );
 		
 		void set_move( float x, float y );
@@ -23,14 +28,29 @@ class Object : public Node, public Transform {
   		
 		sf::RectangleShape getShape( );
 		
-		virtual void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const override ;
+		void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const override;
 		virtual void update( float dt );
 		virtual void handleEvents( sf::Event e);
 
+		void setCurrentTexture( unsigned int );
+
 		//void setObjectType( int t );
+		
 		int getObjectType();
 
-		ObjectData* 		oData;
-		sf::RectangleShape* shape;
+		Collider* getCollider();
+
+		bool checkAnimationPreset( unsigned int );
+
 		Collider* 			collider;
+		
+	protected:
+		sf::RectangleShape* 			shape;
+		unsigned int 					textureVertexIndex;
+
+		std::vector<sf::VertexArray> 	vertexArr;
+
+		sf::Texture* 					spritesheetTexture;
+
+		mutable int 					currentTexture;
 };
